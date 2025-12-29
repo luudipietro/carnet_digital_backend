@@ -16,7 +16,7 @@ class ServicioDeuda:
             'cuit':socio.cuit,
             'nombre':socio.nombre,
             'monto_adeudado':deuda.monto_adeudado,
-            'estado' : 'Adeuda cuota/s' if deuda.monto_adeudado > 0 else 'Al dia'
+            'estado' : 'Inactivo' if deuda.monto_adeudado > 0 else 'Activo'
 
         }
 
