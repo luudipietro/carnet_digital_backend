@@ -5,7 +5,10 @@ class ServicioDeuda:
 
     @staticmethod
     def obtener_estado_deuda(deuda_id):
-        deuda = Deudas.query.filter_by(socio_cuit=deuda_id).first()
+        if len(deuda_id) <= 8:
+            deuda = Deudas.query.filter(Deudas.socio_cuit.like(f'%-{deuda_id}-%')).first()
+        else:
+            deuda = Deudas.query.filter_by(socio_cuit=deuda_id).first() #usamos el cuit
 
         if not deuda:
             return None, 'Socio no encontrado'
