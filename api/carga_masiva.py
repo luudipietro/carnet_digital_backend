@@ -14,9 +14,9 @@ class CargaMasivaResource(Resource):
         if 'deudas' in request.files:
             file_deudas = request.files['deudas']
             data, error = SocioService.procesar_carga_masiva(file_socios, file_deudas)
-
-        # 2. Llamada al Servicio (Siguiendo tu patrón data, error)
-        data, error = SocioService.procesar_carga_masiva(file_socios, None)
+        else:
+            # 2. Llamada al Servicio (Siguiendo tu patrón data, error)
+            data, error = SocioService.procesar_carga_masiva(file_socios, None)
 
         # 3. Respuesta
         if error:
