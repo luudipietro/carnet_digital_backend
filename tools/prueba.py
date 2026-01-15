@@ -1,57 +1,59 @@
+import os
+import traceback
 import pandas as pd
-from sqlalchemy import create_engine
+from unittest.mock import MagicMock
 
-# --- CONFIGURACIÓN ---
-# Si quieres ver el resultado en la BD, pon tus credenciales aquí. 
-# Si solo quieres probar la lógica, deja comentada la parte de SQL.
-# engine = create_engine('mysql+mysqlconnector://usuario:pass@localhost/tu_bd')
+# --- IMPORTACIÓN DINÁMICA ---
+# Importamos la función desde tu archivo real. 
+# Cambia 'helpers' por el nombre de tu archivo .py
+from add_data import procesar_archivos 
 
-# Cambia estos nombres por los nombres exactos de tus archivos reales
-FILE_SOCIOS = "mis_clientes.xlsx" 
-FILE_DEUDAS = "mis_deudas.csv"
+def test_con_archivos_reales():
+    # 1. Configura las rutas a tus archivos locales
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    
+    # Unimos la carpeta con el nombre del archivo
+    PATH_SOCIOS = os.path.join(BASE_DIR, "clientes.xlsx")
+    PATH_DEUDAS = os.path.join(BASE_DIR, "deudas.xlsx")
 
-def probar_con_archivos_reales():
-    print("🚀 Iniciando prueba con archivos reales...")
+    if not os.path.exists(PATH_SOCIOS) or not os.path.exists(PATH_DEUDAS):
+        print("❌ Error: Los archivos reales no se encuentran en la carpeta.")
+        return
+
+    print(f"🚀 Probando función importada con: {PATH_SOCIOS} y {PATH_DEUDAS}")
 
     try:
-        # 1. Cargar archivos
-        df_s = pd.read_excel(FILE_SOCIOS) if FILE_SOCIOS.endswith('.xlsx') else pd.read_csv(FILE_SOCIOS)
-        df_d = pd.read_excel(FILE_DEUDAS) if FILE_DEUDAS.endswith('.xlsx') else pd.read_csv(FILE_DEUDAS)
-
-        print(f"📊 Socios cargados: {len(df_s)} filas")
-        print(f"📊 Deudas cargadas: {len(df_d)} filas")
-
-        # 2. Limpieza de nombres (Crucial para archivos reales)
-        # Pasamos a mayúsculas y quitamos espacios para asegurar que "JUAN PEREZ" coincida con "juan perez "
-        df_s['nombre_apellido'] = df_s['nombre_apellido'].astype(str).str.strip().str.upper()
-        df_d['nombre_apellido'] = df_d['nombre_apellido'].astype(str).str.strip().str.upper()
-
-        # 3. El Cruce (Merge)
-        # Intentamos unir las deudas con los socios usando el nombre
-        df_final = pd.merge(df_s, df_d, on='nombre_apellido', how='left')
-        df_final['monto_deuda'] = df_final['monto_deuda'].fillna(0)
-
-        # 4. Verificaciones de calidad
-        socios_con_deuda = df_final[df_final['monto_deuda'] > 0]
+        # 2. Creamos "Mocks" que simulan el objeto de Flask
+        # Esto engaña a la función para que crea que recibe un objeto con .filename
+        file_s_mock = MagicMock()
+        file_s_mock.file_path = PATH_SOCIOS
         
-        print("\n--- ANÁLISIS DE RESULTADOS ---")
-        print(f"✅ Total de socios procesados: {len(df_final)}")
-        print(f"💰 Socios con deuda detectada: {len(socios_con_deuda)}")
-        
-        # 5. Detectar posibles errores (Nombres que están en deudas pero no en socios)
-        errores = df_d[~df_d['nombre_apellido'].isin(df_s['nombre_apellido'])]
-        if not errores.empty:
-            print("\n⚠️ ALERTA: Hay nombres en el archivo de DEUDAS que no existen en el de SOCIOS:")
-            print(errores['nombre_apellido'].unique()[:10]) # Muestra los primeros 10
-            print(f"Total de nombres no encontrados: {len(errores)}")
+        file_d_mock = MagicMock()
+        file_d_mock.file_path = PATH_DEUDAS
 
-        # 6. Mostrar previsualización
-        print("\n--- VISTA PREVIA DE LOS DATOS A CARGAR ---")
-        print(df_final[['cuit', 'nombre_apellido', 'monto_deuda']].head(10))
+        # 3. LLAMADA A LA FUNCIÓN REAL
+        # Aquí se ejecuta el código que tienes en tu archivo de proyecto
+        resultado = procesar_archivos(file_s_mock, file_d_mock)
+
+        # 4. Reporte de resultados
+        print("\n✅ EJECUCIÓN COMPLETADA")
+        print("--------------------------------------------------")
+        print(f"Filas procesadas: {len(resultado)}")
+        print(f"Deudas vinculadas: {len(resultado[resultado['monto_deuda'] > 0])}")
+        
+        print("\n--- Vista Previa ---")
+        print(resultado.head(80))
+
+        # Verificación de columnas resultantes
+        columnas_esperadas = ['cuit', 'nombre_apellido', 'telefono', 'monto_deuda']
+        if all(col in resultado.columns for col in columnas_esperadas):
+            print("\n💎 Estructura de columnas: CORRECTA")
+        else:
+            print("\n⚠️ Estructura de columnas: INCORRECTA")
 
     except Exception as e:
-        print(f"❌ ERROR CRÍTICO: {e}")
+        print(f"\n💥 Error al ejecutar la función importada: {e}")
+        traceback.print_exc()
 
 if __name__ == "__main__":
-    probar_con_archivos_reales()    
-   
+    test_con_archivos_reales()
