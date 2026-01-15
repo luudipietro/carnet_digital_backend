@@ -1,26 +1,24 @@
-from domain.deudas import Deudas
-from schemas.resumen_deuda import resumen_schema
+from domain.socio import Socio
+from schemas.socio_schema import SocioSchema
 
 class ServicioDeuda:
 
     @staticmethod
     def obtener_estado_deuda(deuda_id):
         if len(deuda_id) <= 8:
-            deuda = Deudas.query.filter(Deudas.socio_cuit.like(f'%-{deuda_id}-%')).first()
+            socio = Socio.query.filter(Socio.cuit.like(f'%-{deuda_id}-%')).first()
         else:
-            deuda = Deudas.query.filter_by(socio_cuit=deuda_id).first() #usamos el cuit
+            socio = Socio.query.filter_by(cuit=deuda_id).first() #usamos el cuit
 
-        if not deuda:
+        if not socio:
             return None, 'Socio no encontrado'
 
-        socio = deuda.socio
-
+        
         data = {
             'cuit':socio.cuit,
             'nombre':socio.nombre,
-            'monto_adeudado':deuda.monto_adeudado,
-            'estado' : 'Inactivo' if deuda.monto_adeudado > 0 else 'Activo'
+            'estado' : 'Inactivo' if socio.monto_adeudado > 0 else 'Activo'
 
         }
 
-        return resumen_schema.dump(data), None
+        return SocioSchema(only=('cuit', 'nombre', 'estado')).dump(data), None
