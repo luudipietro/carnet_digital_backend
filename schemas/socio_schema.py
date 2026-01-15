@@ -11,6 +11,9 @@ class SocioSchema(ma.SQLAlchemySchema):
     cuit = ma.auto_field(required=True, validate=validate.Length(min=1, max=14))
     nombre = ma.auto_field(required=True, validate=validate.Length(min=1, max=100))
     telefono = ma.auto_field(validate=validate.Length(min=1, max=45))
+    monto_adeudado = ma.auto_field(required= True, validate=validate.Range(min=0))
+    estado = fields.String()
+
 
 
 socio_schema = SocioSchema()

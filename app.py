@@ -3,6 +3,7 @@ from flask_cors import CORS
 from extensions import db, ma, migrate
 from api import bp as api_bp  # Importas tu Blueprint
 import api.socios
+import api.carga_masiva
 import domain.deudas
 import domain.socio
 import os
@@ -27,7 +28,7 @@ def create_app():
 
     # 3. Registrar el Blueprint de la API
     app.register_blueprint(api_bp)
-
+    
     @app.get('/')
     def home():
         return 'API de socios de Mutual Sueño Amarillo'
@@ -36,4 +37,5 @@ def create_app():
 
 if __name__ == '__main__':
     app = create_app()
+    print(app.url_map)
     app.run(debug=True, host='0.0.0.0')
