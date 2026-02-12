@@ -43,6 +43,7 @@ dependencies = [
     { name = "pandas" },
     { name = "pymysql" },
     { name = "python-dotenv" },
+    { name = "sqlalchemy" },
 ]
 
 [package.metadata]
@@ -60,6 +61,7 @@ requires-dist = [
     { name = "pandas", specifier = ">=2.3.3" },
     { name = "pymysql", specifier = ">=1.1.2" },
     { name = "python-dotenv", specifier = ">=1.2.1" },
+    { name = "sqlalchemy", specifier = ">=2.0.45" },
 ]
 
 [[package]]

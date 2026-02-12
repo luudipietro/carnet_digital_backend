@@ -74,6 +74,7 @@ def procesar_archivos(file_socios, file_deudas):
 
     # Si un socio no tiene deuda, ponemos 0 en lugar de vacío (NaN)
     df_final['monto_adeudado'] = df_final['monto_adeudado'].fillna(0)
+    df_final['telefono'] = df_final['telefono'].fillna(0)
 
     # Retornamos solo las columnas que necesita nuestra base de datos
     return df_final[['cuit', 'nombre', 'telefono', 'monto_adeudado']]
