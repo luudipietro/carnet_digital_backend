@@ -17,7 +17,7 @@ class ServicioDeuda:
         data = {
             'cuit':socio.cuit,
             'nombre':socio.nombre,
-            'estado' : 'Inactivo' if socio.monto_adeudado > 0 else 'Activo'
+            'estado' : 'Inactivo' if socio.monto_adeudado > 8000 else 'Activo'
 
         }
 
